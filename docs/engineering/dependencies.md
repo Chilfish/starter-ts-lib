@@ -40,3 +40,5 @@ git diff bun.lock
 ## 自动升级
 
 `.github/dependabot.yml` 每周检查 bun 生态依赖。Dependabot PR 必须通过全量 CI 才能合并。
+
+`typescript` 当前忽略 `>=7`：`typescript-eslint` 尚未支持 TS 7，等上游支持后移除该 ignore。

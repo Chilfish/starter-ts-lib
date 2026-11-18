@@ -16,3 +16,8 @@
 - 新增开箱即用基建：`examples/`、`scripts/verify-package.mjs`、`scripts/verify-release-tag.mjs`、`scripts/check-docs.mjs`。
 - 新增社区文件：`CONTRIBUTING.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md`、Issue/PR 模板、`.editorconfig`、`.nvmrc`、Dependabot。
 - CI 增加产物校验、文档校验、示例运行与覆盖率上传；发布增加 registry 轮询。
+
+### 修复
+
+- CI 的 Node 20 job 不再执行构建（tsdown 要求 Node ≥22），改为消费 `dist` artifact 验证运行时。
+- Dependabot 忽略 `typescript >=7`，`typescript-eslint` 尚不支持该版本。

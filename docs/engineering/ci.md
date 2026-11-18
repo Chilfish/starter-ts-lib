@@ -6,8 +6,16 @@
 
 | job | 触发 | 内容 |
 |---|---|---|
-| `check` | push main / PR | typecheck、lint:check、test:coverage、build、产物文件校验 |
-| `runtime` | push main / PR | Node 20/22/24 矩阵，构建后分别以 ESM 与 CJS 导入验证 |
+| `check` | push main / PR | typecheck、lint:check、test:coverage、build、产物与文档校验、示例运行；上传 `dist` 与 `coverage` artifact |
+| `runtime` | push main / PR | 依赖 `check`，下载 `dist` artifact，在 Node 20/22/24 下分别以 ESM 与 CJS 导入验证 |
+
+## Node 版本
+
+构建工具（tsdown / TypeScript 工具链）要求 Node ≥22，而库本身支持 Node ≥20。因此：
+
+- **构建只在 `check` job（Node 24）执行一次**。
+- `runtime` job 不安装依赖、不构建，只消费 `dist` artifact。
+- 这样 Node 20 验证的是「产物能否运行」，而不是「工具链能否构建」。
 
 ## 约定
 
