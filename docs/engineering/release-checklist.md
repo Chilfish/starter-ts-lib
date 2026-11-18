@@ -13,14 +13,13 @@
 
 ```bash
 bun install --frozen-lockfile
-bun run typecheck
-bun run lint:check
-bun run test
-bun run build
+bun run check
+bun run check:docs
 ```
 
-- [ ] 四项全部通过
+- [ ] 全部通过
 - [ ] `dist/` 下存在 `index.js` / `index.cjs` / `index.d.ts` / `index.d.cts`
+- [ ] `bun run verify:package` 通过
 - [ ] 本地 `node -e "require('./dist/index.cjs')"` 与 ESM 导入均成功
 
 ## 发版

@@ -23,7 +23,7 @@ dist/index.d.ts    ESM 类型
 dist/index.d.cts   CJS 类型
 ```
 
-CI 会在 build 后校验这四个文件存在，并分别在 Node 20/22/24 下导入验证。
+CI 会在 build 后校验这四个文件存在，并分别在 Node 20/22/24 下导入验证；`bun run verify:package` 还会检查 tarball 文件清单，确保源码、测试、脚本不会被打进发布包。
 
 ## package.json 契约
 
