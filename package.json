@@ -1,61 +1,77 @@
 {
-  "name": "pkg-placeholder",
+  "name": "starter-ts-lib",
   "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@10.13.1",
-  "description": "_description_",
+  "packageManager": "bun@1.4.4",
+  "description": "A modern TypeScript library scaffold with tsdown, Vitest, ESLint and release automation.",
   "author": "Chilfish",
   "license": "MIT",
-  "homepage": "https://github.com/Chilfish/pkg-placeholder#readme",
+  "homepage": "https://github.com/Chilfish/starter-ts-lib#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Chilfish/pkg-placeholder.git"
+    "url": "git+https://github.com/Chilfish/starter-ts-lib.git"
   },
-  "bugs": "https://github.com/Chilfish/pkg-placeholder/issues",
-  "keywords": [],
+  "bugs": "https://github.com/Chilfish/starter-ts-lib/issues",
+  "keywords": [
+    "typescript",
+    "starter",
+    "template",
+    "library"
+  ],
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
+    "LICENSE.md",
+    "README.md",
     "dist"
   ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --stub",
-    "lint": "eslint",
-    "prepublishOnly": "nr build",
-    "release": "bumpp && pnpm publish",
-    "start": "tsx src/index.ts",
-    "test": "vitest",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
     "typecheck": "tsc --noEmit",
-    "prepare": "simple-git-hooks"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "start": "bun src/index.ts",
+    "prepublishOnly": "bun run build",
+    "release": "bumpp",
+    "prepare": "lefthook install"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "catalog:cli",
-    "@antfu/ni": "catalog:cli",
-    "@types/node": "catalog:types",
-    "bumpp": "catalog:cli",
-    "eslint": "catalog:cli",
-    "lint-staged": "catalog:cli",
-    "simple-git-hooks": "catalog:cli",
-    "tinyexec": "catalog:utils",
-    "tsx": "catalog:cli",
-    "typescript": "catalog:cli",
-    "unbuild": "catalog:cli",
-    "vite": "catalog:cli",
-    "vitest": "catalog:testing",
-    "vitest-package-exports": "catalog:testing",
-    "yaml": "catalog:testing"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm i --frozen-lockfile --ignore-scripts --offline && npx lint-staged"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
+    "@antfu/eslint-config": "^10.0.0",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.1",
+    "bumpp": "^12.3.0",
+    "eslint": "^10.15.0",
+    "eslint-plugin-format": "^2.0.1",
+    "lefthook": "^2.2.2",
+    "tsdown": "^0.23.7",
+    "typescript": "6.0.3",
+    "vitest": "^5.1.1"
   }
 }
