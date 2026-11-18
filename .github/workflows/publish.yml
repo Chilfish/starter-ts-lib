@@ -1,0 +1,64 @@
+name: Publish
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # 不设置 registry-url：认证通过 npm Trusted Publisher (OIDC) 交换短期凭据，
+          # registry-url 会写入带占位 token 的 .npmrc，反而干扰 OIDC。
+
+      - name: Upgrade npm for Trusted Publisher
+        run: npm install -g npm@latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Verify tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          echo "tag=$tag package=$pkg"
+          test "$tag" = "$pkg"
+
+      - name: Verify CHANGELOG entry
+        run: |
+          pkg="$(node -p "require('./package.json').version")"
+          grep -q "^## $pkg" CHANGELOG.md
+
+      - run: bun run typecheck
+      - run: bun run lint:check
+      - run: bun run test
+      - run: bun run build
+
+      - name: Verify build output
+        run: |
+          test -f dist/index.js
+          test -f dist/index.cjs
+          test -f dist/index.d.ts
+          test -f dist/index.d.cts
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
