@@ -32,6 +32,8 @@ bun run typecheck
 bun run lint:check
 bun run test
 bun run build
+bun run check        # 全量门禁
+bun run check:docs   # 文档链接与索引
 ```
 
 ## 目录
@@ -40,5 +42,8 @@ bun run build
 |---|---|
 | `src/index.ts` | 唯一公开入口 |
 | `tests/` | 测试，镜像 `src/` |
+| `examples/` | 可运行示例 |
+| `scripts/` | 门禁与发布脚本 |
 | `docs/` | 内部文档，索引在 `docs/README.md` |
 | `.github/workflows/` | `ci.yml` / `publish.yml` |
+| `.github/ISSUE_TEMPLATE/` | Issue 模板 |

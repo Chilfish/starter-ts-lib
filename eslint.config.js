@@ -18,6 +18,8 @@ export default antfu(
     rules: {
       'no-console': 'off',
       'unused-imports/no-unused-vars': 'warn',
+      'node/prefer-global/process': 'off',
+      'node/prefer-global/buffer': 'off',
     },
   },
 )

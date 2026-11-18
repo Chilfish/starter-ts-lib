@@ -13,3 +13,6 @@
 - 修复 `exports` 条件类型、`engines`、`publishConfig` 等元数据。
 - 测试迁移到 `tests/`，增加导出面契约测试与覆盖率配置。
 - 新增 `docs/` 文档体系、`AGENTS.md`、`CHANGELOG.md`。
+- 新增开箱即用基建：`examples/`、`scripts/verify-package.mjs`、`scripts/verify-release-tag.mjs`、`scripts/check-docs.mjs`。
+- 新增社区文件：`CONTRIBUTING.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md`、Issue/PR 模板、`.editorconfig`、`.nvmrc`、Dependabot。
+- CI 增加产物校验、文档校验、示例运行与覆盖率上传；发布增加 registry 轮询。

@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           # 不设置 registry-url：认证通过 npm Trusted Publisher (OIDC) 交换短期凭据，
@@ -37,11 +37,7 @@ jobs:
 
       - name: Verify tag matches package.json
         if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          tag="${GITHUB_REF_NAME#v}"
-          pkg="$(node -p "require('./package.json').version")"
-          echo "tag=$tag package=$pkg"
-          test "$tag" = "$pkg"
+        run: bun run verify:tag "${{ github.ref_name }}"
 
       - name: Verify CHANGELOG entry
         run: |
@@ -52,13 +48,22 @@ jobs:
       - run: bun run lint:check
       - run: bun run test
       - run: bun run build
-
-      - name: Verify build output
-        run: |
-          test -f dist/index.js
-          test -f dist/index.cjs
-          test -f dist/index.d.ts
-          test -f dist/index.d.cts
+      - run: bun run verify:package
+      - run: bun run check:docs
 
       - name: Publish to npm
         run: npm publish --provenance --access public
+
+      - name: Verify registry
+        run: |
+          pkg="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+          for attempt in $(seq 1 30); do
+            if npm view "$pkg@$version" version; then
+              exit 0
+            fi
+            echo "registry 尚未可安装（第 $attempt 次），10s 后重试"
+            sleep 10
+          done
+          echo "registry 在 300s 内没有出现 $pkg@$version"
+          exit 1
