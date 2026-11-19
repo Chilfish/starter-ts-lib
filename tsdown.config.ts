@@ -10,6 +10,6 @@ export default defineConfig({
   deps: {
     neverBundle: [/^node:/],
   },
-  // exports 由 package.json 手工维护，构建过程不得改写它。
+  // package.json maintains exports by hand; the build must never rewrite it.
   exports: false,
 })
