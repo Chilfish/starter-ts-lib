@@ -1,24 +1,24 @@
 # Pull Request
 
-## 动机
+## Motivation
 
-<!-- 为什么需要这个改动？关联 issue：Closes # -->
+<!-- Why is this change needed? Linked issue: Closes # -->
 
-## 行为变化
+## Behavior change
 
-<!-- 用户可观察到的变化；没有则写「无」 -->
+<!-- What users can observe; write "None" if there is none -->
 
-## 验证方式
+## Verification
 
-<!-- 列出执行的命令与结果 -->
+<!-- List the commands you ran and their results -->
 
 - [ ] `bun run check`
-- [ ] `bun run check:docs`（涉及文档时）
+- [ ] `bun run check:docs` (when documentation is involved)
 
-## 检查表
+## Checklist
 
-- [ ] 只包含本次改动，没有顺手重构
-- [ ] 新增逻辑有测试；修 bug 先补了复现用例
-- [ ] 公开契约变化已更新 `CHANGELOG.md` 的 `## Unreleased`
-- [ ] 文档中的路径、命令、字段与代码一致
-- [ ] 没有提交 `--no-verify`
+- [ ] Contains only this change, no opportunistic refactoring
+- [ ] New logic has tests; a bug fix starts with a reproduction case
+- [ ] Public contract changes update `## Unreleased` in `CHANGELOG.md`
+- [ ] Paths, commands, and fields in the docs match the code
+- [ ] No `--no-verify` was used
