@@ -8,7 +8,7 @@ import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
-const failures = []
+const failures: string[] = []
 const linkPattern = /\[[^\]]*\]\(([^)]+)\)/g
 
 const UNREGISTERED_EXEMPT = new Set([
@@ -17,8 +17,8 @@ const UNREGISTERED_EXEMPT = new Set([
 ])
 const UNREGISTERED_PREFIXES = ['docs/development-log/']
 
-function walk(dir) {
-  const files = []
+function walk(dir: string): string[] {
+  const files: string[] = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'coverage')
       continue

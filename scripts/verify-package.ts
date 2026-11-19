@@ -10,25 +10,33 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-const root = fileURLToPath(new URL('..', import.meta.url))
-const failures = []
+interface PackFile {
+  path: string
+}
 
-function fail(message) {
+interface PackInfo {
+  files: PackFile[]
+}
+
+const root = fileURLToPath(new URL('..', import.meta.url))
+const failures: string[] = []
+
+function fail(message: string): void {
   failures.push(message)
 }
 
-function collectTargets(value, targets = []) {
+function collectTargets(value: unknown, targets: string[] = []): string[] {
   if (typeof value === 'string') {
     targets.push(value)
   }
-  else if (value && typeof value === 'object') {
+  else if (typeof value === 'object' && value !== null) {
     for (const nested of Object.values(value))
       collectTargets(nested, targets)
   }
   return targets
 }
 
-const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'))
+const pkg: { exports?: unknown } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'))
 
 for (const target of collectTargets(pkg.exports)) {
   if (!target.startsWith('./'))
@@ -47,7 +55,7 @@ for (const file of [
     fail(`缺少构建产物: ${file}`)
 }
 
-let packInfo
+let packInfo: PackInfo | undefined
 try {
   const packArgs = [
     'pack',
@@ -72,10 +80,13 @@ try {
         encoding: 'utf-8',
         stdio: ['ignore', 'pipe', 'pipe'],
       })
-  packInfo = JSON.parse(output)[0]
+  packInfo = (JSON.parse(output) as PackInfo[])[0]
 }
 catch (error) {
-  fail(`npm pack --dry-run 失败: ${error.message}`)
+  const message = error instanceof Error
+    ? error.message
+    : String(error)
+  fail(`npm pack --dry-run 失败: ${message}`)
 }
 
 if (packInfo) {
@@ -101,7 +112,7 @@ if (packInfo) {
   }
 }
 
-if (failures.length > 0) {
+if (failures.length > 0 || !packInfo) {
   console.error('verify-package 失败:')
   for (const message of failures)
     console.error(`  - ${message}`)
