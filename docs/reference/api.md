@@ -1,43 +1,43 @@
-# 公开 API
+# Public API
 
-当前脚手架只有占位 API，替换 `src/index.ts` 后请同步更新本文。
+The scaffold currently exposes a placeholder API. Update this document when you replace `src/index.ts`.
 
-## 导出面
+## Export surface
 
 ```ts
 export const one = 1
 export const two = 2
 ```
 
-| 导出 | 类型 | 说明 |
+| Export | Type | Description |
 |---|---|---|
-| `one` | `1` | 占位常量 |
-| `two` | `2` | 占位常量 |
+| `one` | `1` | Placeholder constant |
+| `two` | `2` | Placeholder constant |
 
-## 入口
+## Entries
 
-| 入口 | 产物 | 适用 |
+| Entry | Artifact | Use |
 |---|---|---|
 | `import { one } from 'starter-ts-lib'` | `dist/index.js` | ESM |
 | `const { one } = require('starter-ts-lib')` | `dist/index.cjs` | CJS |
 
-两种入口的公开 API 完全一致，类型声明分别为 `index.d.ts` / `index.d.cts`。
+Both entries expose the same public API; the type declarations are `index.d.ts` and `index.d.cts` respectively.
 
-## 契约
+## Contract
 
-- 只提供具名导出，没有默认导出。
-- 运行时零依赖，不访问网络、文件系统或全局状态。
-- 导出面变化属于公开契约变更，必须：
-  1. 更新本文件与 `README.md`
-  2. 更新 `tests/exports.test.ts`
-  3. 在 `CHANGELOG.md` 标注，破坏性变更需说明迁移方式
+- Named exports only; there is no default export.
+- Zero runtime dependencies; the library does not touch the network, the filesystem, or global state.
+- A change to the export surface is a public contract change and must:
+  1. Update this document and `README.md`
+  2. Update `tests/exports.test.ts`
+  3. Be noted in `CHANGELOG.md`, with a migration path for breaking changes
 
-## 扩展子路径
+## Adding a subpath
 
-新增 `./node` 这类入口时：
+When adding an entry such as `./node`:
 
-1. 增加 `src/node.ts`
-2. 在 `tsdown.config.ts` 的 `entry` 中加入
-3. 在 `package.json#exports` 中声明 `import` / `require` 各自带 `types`
-4. 在 `tests/exports.test.ts` 增加断言
-5. 在本文与 [package-contract](./package-contract.md) 登记
+1. Add `src/node.ts`
+2. Add it to `entry` in `tsdown.config.ts`
+3. Declare it in `package.json#exports` with `types` under both `import` and `require`
+4. Add an assertion in `tests/exports.test.ts`
+5. Register it here and in [package-contract](./package-contract.md)

@@ -1,28 +1,28 @@
-# 安全策略
+# Security policy
 
-## 支持的版本
+## Supported versions
 
-仅最新发布版本接受安全修复。
+Only the latest released version receives security fixes.
 
-## 报告漏洞
+## Reporting a vulnerability
 
-请通过 GitHub Security Advisories 私下报告：
+Report privately through GitHub Security Advisories:
 
 <https://github.com/Chilfish/starter-ts-lib/security/advisories/new>
 
-不要创建公开 issue，也不要在 PR 中披露可利用细节。
+Do not open a public issue and do not disclose exploitation details in a pull request.
 
-报告时请包含：
+Include in the report:
 
-- 受影响版本
-- 复现步骤或最小复现仓库
-- 影响范围与可能的利用方式
-- 你建议的修复方向（可选）
+- Affected version
+- Reproduction steps or a minimal reproduction repository
+- Impact and possible exploitation path
+- Your suggested fix direction (optional)
 
-## 响应
+## Response
 
-- 收到报告后确认复现并评估影响。
-- 修复以 patch 版本发布，并在 CHANGELOG 中说明范围。
-- 修复完成后按 [postmortem](./docs/postmortem/README.md) 记录。
+- Confirm the reproduction and assess the impact after receiving the report.
+- Ship the fix as a patch release and describe the scope in the CHANGELOG.
+- Record the incident under [postmortem](./docs/postmortem/README.md) after the fix lands.
 
-详见 [docs/engineering/security.md](./docs/engineering/security.md)。
+See [docs/engineering/security.md](./docs/engineering/security.md) for the project's security rules.

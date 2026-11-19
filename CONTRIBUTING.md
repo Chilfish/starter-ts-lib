@@ -1,46 +1,46 @@
-# 贡献指南
+# Contributing
 
-感谢参与。提交前请先读 [docs/README.md](./docs/README.md) 与 [AGENTS.md](./AGENTS.md)。
+Read [docs/README.md](./docs/README.md) and [AGENTS.md](./AGENTS.md) before opening a pull request.
 
-## 开发流程
+## Development flow
 
 ```bash
 bun install
 bun run check        # typecheck + lint + test:coverage + build + verify:package
-bun run check:docs   # 文档链接与索引校验
+bun run check:docs   # documentation links and index
 ```
 
-## 分支与提交
+## Branches and commits
 
-- 从 `main` 拉短分支：`feat/<scope>`、`fix/<scope>`、`docs/<scope>`。
-- Conventional Commits：`type(scope): 简短中文摘要`。
-- pre-commit 自动 `eslint --fix`，pre-push 自动 `build`。
+- Branch off `main` with a short name: `feat/<scope>`, `fix/<scope>`, `docs/<scope>`.
+- Conventional Commits: `type(scope): short English summary`.
+- `pre-commit` runs `eslint --fix`; `pre-push` runs `build`.
 
-## 代码要求
+## Code requirements
 
-- 具名导出，禁止 `export default`。
-- 类型导入使用 `import type`。
-- 禁止 `any`。
-- 新增逻辑必须带测试；修 bug 先补复现用例。
-- 不改无关代码，不做顺手的重构。
+- Named exports only; `export default` is forbidden.
+- Type imports use `import type`.
+- No `any`.
+- New logic needs tests; a bug fix starts with a reproduction case.
+- Do not touch unrelated code and do not refactor along the way.
 
-## 文档要求
+## Documentation requirements
 
-以下改动必须先更新文档：
+Update the documentation first for:
 
-- 公开契约变化（导出面、类型、行为）
-- 构建或发布流程变化
-- 事故修复（写入 `docs/postmortem/`）
+- Public contract changes (export surface, types, behavior)
+- Build or release process changes
+- Incident fixes (recorded under `docs/postmortem/`)
 
-其余改动更新 `docs/development-log/`。
+Other changes get an entry in `docs/development-log/`.
 
-## PR
+## Pull requests
 
-- 标题遵循提交格式。
-- 描述包含动机、行为变化、验证方式。
-- 公开契约变化同步 `CHANGELOG.md` 的 `## Unreleased`。
-- 确保 CI 全绿后再请求 review。
+- The title follows the commit format.
+- The description covers the motivation, the behavior change, and how it was verified.
+- Public contract changes update `## Unreleased` in `CHANGELOG.md`.
+- Wait for a green CI run before requesting review.
 
-## 报告问题
+## Reporting issues
 
-使用 [Issue 模板](https://github.com/Chilfish/starter-ts-lib/issues/new/choose)。安全问题请勿公开提交，见 [SECURITY.md](./SECURITY.md)。
+Use the [issue templates](https://github.com/Chilfish/starter-ts-lib/issues/new/choose). Do not report security issues in public; see [SECURITY.md](./SECURITY.md).

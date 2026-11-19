@@ -1,45 +1,45 @@
 # CI
 
-流水线定义在 `.github/workflows/ci.yml`。
+The pipeline is defined in `.github/workflows/ci.yml`.
 
-## 结构
+## Structure
 
-| job | 触发 | 内容 |
+| Job | Trigger | Content |
 |---|---|---|
-| `check` | push main / PR | typecheck、lint:check、test:coverage、build、产物与文档校验、示例运行；上传 `dist` 与 `coverage` artifact |
-| `runtime` | push main / PR | 依赖 `check`，下载 `dist` artifact，在 Node 20/22/24 下分别以 ESM 与 CJS 导入验证 |
+| `check` | push to main / PR | typecheck, lint:check, test:coverage, build, artifact and documentation checks, example run; uploads the `dist` and `coverage` artifacts |
+| `runtime` | push to main / PR | depends on `check`, downloads the `dist` artifact, and imports it as ESM and CJS under Node 20/22/24 |
 
-## Node 版本
+## Node versions
 
-构建工具（tsdown / TypeScript 工具链）要求 Node ≥22，而库本身支持 Node ≥20。因此：
+Build tooling (tsdown / the TypeScript toolchain) requires Node >=22 while the library supports Node >=20. Therefore:
 
-- **构建只在 `check` job（Node 24）执行一次**。
-- `runtime` job 不安装依赖、不构建，只消费 `dist` artifact。
-- 这样 Node 20 验证的是「产物能否运行」，而不是「工具链能否构建」。
+- **The build runs once, in the `check` job (Node 24).**
+- The `runtime` job does not install dependencies or build; it only consumes the `dist` artifact.
+- This way Node 20 verifies "does the artifact run", not "can the toolchain build".
 
-## 约定
+## Conventions
 
-- **权限最小化**：`permissions: contents: read`。
-- **并发取消**：同 ref 的新跑会取消旧跑（`cancel-in-progress: true`）。
-- **锁文件**：`bun install --frozen-lockfile`，manifest 与 `bun.lock` 不一致直接失败。
-- **版本一致**：`packageManager`、CI 的 `bun-version`、README 中的版本必须同步。
-- **门禁不跳过**：任何一步失败都视为红灯，不使用 `continue-on-error`。
+- **Least privilege**: `permissions: contents: read`.
+- **Cancel superseded runs**: a new run on the same ref cancels the old one (`cancel-in-progress: true`).
+- **Lockfile**: `bun install --frozen-lockfile` fails immediately when the manifest and `bun.lock` disagree.
+- **Version consistency**: `packageManager`, the CI `bun-version`, and the README version must match.
+- **Gates never skip**: any failing step is red; `continue-on-error` is not used.
 
-## 缓存
+## Caching
 
-`oven-sh/setup-bun@v2` 自带依赖缓存，无需额外 `actions/cache`。不要在 CI 中提交 `node_modules`。
+`oven-sh/setup-bun@v2` caches dependencies itself; no extra `actions/cache` is needed. Do not commit `node_modules` in CI.
 
-## 排障
+## Troubleshooting
 
-| 报错 | 原因 | 处理 |
+| Error | Cause | Action |
 |---|---|---|
-| `lockfile had changes` | `bun.lock` 未更新 | 本地 `bun install` 并提交锁文件 |
-| `Cannot find module 'dist/index.js'` | 未先构建 | 检查步骤顺序，build 在导入验证之前 |
-| `eslint` 仅 CI 失败 | 本地用 `lint` 自动修复过 | 提交前跑 `bun run lint:check` |
-| 覆盖率下降 | 新增代码无测试 | 补测试，不要下调阈值 |
+| `lockfile had changes` | `bun.lock` is out of date | Run `bun install` locally and commit the lockfile |
+| `Cannot find module 'dist/index.js'` | the build did not run first | Check step order; the build must precede the import verification |
+| `eslint` fails only in CI | `lint` already auto-fixed locally | Run `bun run lint:check` before committing |
+| Coverage dropped | new code has no tests | Add tests; do not lower the threshold |
 
-## 修改 workflow 时
+## When changing a workflow
 
-1. 确认 action 版本真实存在（`checkout@v4`、`setup-bun@v2`、`setup-node@v4`）。
-2. 发布相关改动同步 [build-and-release](./build-and-release.md)。
-3. 新增门禁时同步 [release-checklist](./release-checklist.md)。
+1. Confirm the action version really exists (`checkout@v4`, `setup-bun@v2`, `setup-node@v4`).
+2. Mirror release-related changes in [build-and-release](./build-and-release.md).
+3. Mirror new gates in [release-checklist](./release-checklist.md).

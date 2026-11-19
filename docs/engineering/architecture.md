@@ -1,49 +1,49 @@
-# 架构
+# Architecture
 
-## 目标
+## Goal
 
-这是一个可复用的 TypeScript 库脚手架。默认形态是**单入口、零运行时依赖、平台无关**，按需扩展。
+This is a reusable TypeScript library scaffold. The default shape is **a single entry, zero runtime dependencies, and platform-neutral**, extended as needed.
 
-## 分层
-
-```
-src/index.ts          公开入口（barrel，只做 re-export）
-src/<domain>/         领域实现，按职责拆分目录
-tests/                测试，目录镜像 src/
-docs/                 内部文档
-```
-
-依赖方向严格单向：
+## Layering
 
 ```
-index.ts  →  domain  →  utils
-                  ↘  types
+src/index.ts          public entry (barrel, re-export only)
+src/<domain>/         domain implementations, split by responsibility
+tests/                tests, mirroring src/
+docs/                 internal documentation
 ```
 
-- `utils/` 不得引用 `domain/`。
-- `domain/` 之间需要互相调用时，通过显式注入或注册表解耦，避免 ESM 循环依赖。
-- `src/index.ts` 是唯一对外承诺的入口；内部模块路径不属于公开 API。
+The dependency direction is strictly one-way:
 
-## 公开面
+```
+index.ts  ->  domain  ->  utils
+                  \->  types
+```
 
-- 只使用具名导出，禁止 `export default`。
-- 类型与值分开导出：`export type { ... }` / `export { ... }`。
-- `package.json#exports` 决定发布面，`tests/exports.test.ts` 锁定其形状。
-- 新增导出视为公开契约变化，必须更新 CHANGELOG 与文档。
+- `utils/` must not import from `domain/`.
+- When `domain/` modules need each other, decouple through explicit injection or a registry to avoid ESM cycles.
+- `src/index.ts` is the only promised entry; internal module paths are not public API.
 
-## 平台无关
+## Public surface
 
-构建目标为 `platform: 'neutral'`，不内联 Node 内置模块：
+- Named exports only; `export default` is forbidden.
+- Export types and values separately: `export type { ... }` / `export { ... }`.
+- `package.json#exports` defines the published surface; `tests/exports.test.ts` locks its shape.
+- A new export counts as a public contract change and must update the CHANGELOG and docs.
 
-- 源码里可以 `import type` 引用 `node:*` 类型。
-- 运行时代码避免 `node:` 导入；确需 Node 能力时，拆成独立的子路径入口（如 `./node`）并单独声明 exports。
-- 浏览器/Edge 兼容性由「零运行时依赖 + neutral 构建」保证。
+## Platform neutrality
 
-## 扩展方式
+The build targets `platform: 'neutral'` and does not inline Node built-ins:
 
-| 需求 | 做法 |
+- Source may reference `node:*` types with `import type`.
+- Runtime code avoids `node:` imports; when Node capabilities are needed, split them into a separate subpath entry (such as `./node`) with its own exports.
+- Browser and Edge compatibility comes from "zero runtime dependencies plus a neutral build".
+
+## Extending
+
+| Need | Approach |
 |---|---|
-| 增加子路径入口 | 新增 `src/<name>.ts`，在 tsdown `entry` 与 `package.json#exports` 同步声明 |
-| 增加 CLI | 单独一个构建目标，`platform: 'node'`，依赖用 `onlyBundle` 白名单内联 |
-| 引入运行时依赖 | 同步评估 ESM/CJS 双格式、tree-shaking、`sideEffects` |
-| 拆分多包 | 迁移到 workspace，并把版本集中到 catalog |
+| Add a subpath entry | Add `src/<name>.ts`, declare it in the tsdown `entry` and in `package.json#exports` |
+| Add a CLI | A separate build target, `platform: 'node'`, dependencies inlined through an `onlyBundle` allowlist |
+| Add a runtime dependency | Evaluate ESM/CJS duality, tree-shaking, and `sideEffects` at the same time |
+| Split into packages | Move to a workspace and centralize versions in a catalog |

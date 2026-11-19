@@ -1,24 +1,26 @@
 # Changelog
 
-本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与 [SemVer](https://semver.org/lang/zh-CN/)。
+This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [SemVer](https://semver.org/).
 
 ## Unreleased
 
-### 变更
+### Changed
 
-- 门禁脚本从 `.mjs` 迁移到 TypeScript（`scripts/*.ts`），由 `bun` 直接执行，并纳入 `tsc --noEmit` 检查。
-- 构建工具从 unbuild 迁移到 tsdown，产出 ESM + CJS 双格式与独立类型声明。
-- 包管理器从 pnpm 切换到 Bun，锁文件为 `bun.lock`。
-- CI/发布流水线改用真实存在的 action 版本，发布走 OIDC + provenance。
-- 使用 lefthook 接管 Git hooks：pre-commit 对暂存文件执行 `eslint --fix`，pre-push 构建。
-- 修复 `exports` 条件类型、`engines`、`publishConfig` 等元数据。
-- 测试迁移到 `tests/`，增加导出面契约测试与覆盖率配置。
-- 新增 `docs/` 文档体系、`AGENTS.md`、`CHANGELOG.md`。
-- 新增开箱即用基建：`examples/`、`scripts/verify-package.ts`、`scripts/verify-release-tag.ts`、`scripts/check-docs.ts`。
-- 新增社区文件：`CONTRIBUTING.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md`、Issue/PR 模板、`.editorconfig`、`.nvmrc`、Dependabot。
-- CI 增加产物校验、文档校验、示例运行与覆盖率上传；发布增加 registry 轮询。
+- All project text is now English only: documentation, code comments, script output, CI messages, and the changelog. The rules live in [docs/engineering/writing-style.md](./docs/engineering/writing-style.md).
+- Gate scripts moved from `.mjs` to TypeScript (`scripts/*.ts`), run directly by `bun`, and covered by `tsc --noEmit`.
+- Build tooling migrated from unbuild to tsdown, producing ESM + CJS dual format with standalone type declarations.
+- Package manager switched from pnpm to Bun, with `bun.lock` as the lockfile.
+- CI and release pipelines use action versions that exist; publishing goes through OIDC with provenance.
+- lefthook owns Git hooks: pre-commit runs `eslint --fix` on staged files, pre-push builds.
+- Fixed `exports` conditional types, `engines`, `publishConfig`, and other metadata.
+- Tests moved to `tests/`, with export-surface contract tests and coverage configuration added.
+- Added the `docs/` documentation system, `AGENTS.md`, and `CHANGELOG.md`.
+- Added out-of-the-box infrastructure: `examples/`, `scripts/verify-package.ts`, `scripts/verify-release-tag.ts`, and `scripts/check-docs.ts`.
+- Added community files: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue and PR templates, `.editorconfig`, `.nvmrc`, and Dependabot.
+- CI now verifies artifacts, documentation, and the example run, and uploads coverage; publishing now polls the registry.
 
-### 修复
+### Fixed
 
-- CI 的 Node 20 job 不再执行构建（tsdown 要求 Node ≥22），改为消费 `dist` artifact 验证运行时。
-- Dependabot 忽略 `typescript >=7`，`typescript-eslint` 尚不支持该版本。
+- `publishConfig.provenance` was removed and the `publish` job is gated behind `NPM_OIDC_READY`. npm cannot generate provenance for a local manual publish, so the first bootstrap release failed with `EUSAGE`; the gate also stops a tag push from publishing before the Trusted Publisher is bound.
+- The CI Node 20 job no longer runs the build (tsdown requires Node >=22); it consumes the `dist` artifact to verify the runtime instead.
+- Dependabot ignores `typescript >=7`, which `typescript-eslint` does not support yet.

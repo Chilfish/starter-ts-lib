@@ -1,18 +1,18 @@
-# package.json 契约
+# package.json contract
 
-`package.json` 是发布产物的唯一事实来源，构建过程不得改写发布字段。
+`package.json` is the single source of truth for the published artifact; the build must not rewrite the publishing fields.
 
-## 必填字段
+## Required fields
 
-| 字段 | 当前值 | 约束 |
+| Field | Current value | Constraint |
 |---|---|---|
-| `name` | `starter-ts-lib` | 需要与 npm 包名一致 |
-| `type` | `module` | 源码与 ESM 产物均按 ESM 解析 |
-| `packageManager` | `bun@1.4.4` | 必须与 CI 的 bun 版本一致 |
-| `sideEffects` | `false` | 保证 tree-shaking |
-| `files` | `dist` / `LICENSE.md` / `README.md` | 只发布产物与文档 |
-| `engines.node` | `>=20` | 与 CI 运行时矩阵下限一致 |
-| `publishConfig` | `access: public` | provenance 由 workflow 的 `npm publish --provenance` 显式开启，不写进 `publishConfig`（否则本地手动发布会报 EUSAGE） |
+| `name` | `starter-ts-lib` | must match the npm package name |
+| `type` | `module` | source and the ESM artifact are both parsed as ESM |
+| `packageManager` | `bun@1.4.4` | must match the CI Bun version |
+| `sideEffects` | `false` | guarantees tree-shaking |
+| `files` | `dist` / `LICENSE.md` / `README.md` | publishes only artifacts and docs |
+| `engines.node` | `>=20` | matches the lower bound of the CI runtime matrix |
+| `publishConfig` | `access: public` | provenance is turned on explicitly by the workflow's `npm publish --provenance`; it is not set in `publishConfig`, where a local manual publish would fail with `EUSAGE` |
 
 ## exports
 
@@ -26,38 +26,38 @@
 }
 ```
 
-规则：
+Rules:
 
-- `types` 必须位于各自条件分支内、且在 `default` 之前。
-- 不允许裸字符串导出（例如 `".": "./dist/index.js"`）。
-- 每个目标文件必须真实存在，`bun run verify:package` 会校验。
-- 新增子路径时同步 `tests/exports.test.ts`。
+- `types` must sit inside each condition, before `default`.
+- Bare string exports are not allowed (for example `".": "./dist/index.js"`).
+- Every target file must exist; `bun run verify:package` checks it.
+- Sync `tests/exports.test.ts` when adding a subpath.
 
-## 顶层兼容字段
+## Legacy top-level fields
 
-`main` / `module` / `types` 仅为兼容旧工具保留：
+`main` / `module` / `types` are kept only for older tools:
 
-| 字段 | 值 |
+| Field | Value |
 |---|---|
 | `main` | `./dist/index.cjs` |
 | `module` | `./dist/index.js` |
 | `types` | `./dist/index.d.ts` |
 
-新代码应依赖 `exports`，不要依赖这三个字段。
+New code should rely on `exports`, not these three fields.
 
-## 依赖
+## Dependencies
 
-- `dependencies` 必须为空（零运行时依赖）。
-- 工具链全部放 `devDependencies`，版本使用 caret。
-- 修改依赖后必须提交更新后的 `bun.lock`。
-- 策略详见 [dependencies](../engineering/dependencies.md)。
+- `dependencies` must stay empty (zero runtime dependencies).
+- The toolchain lives entirely in `devDependencies` with caret versions.
+- After changing a dependency, commit the updated `bun.lock`.
+- Policy is in [dependencies](../engineering/dependencies.md).
 
-## 脚本
+## Scripts
 
-| 脚本 | 约定 |
+| Script | Convention |
 |---|---|
-| `build` | 只调用 `tsdown`，不做额外拷贝 |
-| `check` | 汇总全量门禁，CI 与本地共用 |
-| `check:docs` / `verify:package` / `verify:tag` | 门禁脚本用 TypeScript 编写，由 `bun` 直接执行（无需构建） |
-| `prepublishOnly` | 只构建，防误发 |
-| `release` | 只做版本升级与 tag，不在本地 publish |
+| `build` | Calls only `tsdown`; no extra copying |
+| `check` | Aggregates the full gate, shared by CI and local runs |
+| `check:docs` / `verify:package` / `verify:tag` | Gate scripts written in TypeScript and run directly by `bun` (no build step) |
+| `prepublishOnly` | Builds only, to prevent an accidental publish |
+| `release` | Bumps the version and creates a tag; does not publish locally |

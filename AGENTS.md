@@ -1,30 +1,34 @@
 # AGENTS.md
 
-仓库级硬约束。细节见 [docs/README.md](./docs/README.md)，两者冲突时以代码与本文为准并顺手修正文档。
+Repository-level hard constraints. Details live in [docs/README.md](./docs/README.md); when the two conflict, the code and this file win, and the documentation is corrected along the way.
 
-## 技术栈
+## Language
 
-- 包管理器：**Bun**（锁文件 `bun.lock`，CI 使用 `--frozen-lockfile`）
-- 构建：**tsdown**，ESM + CJS 双格式，`platform: 'neutral'`
-- 测试：**Vitest**，v8 coverage
-- 风格：**@antfu/eslint-config**（含 formatters），不使用 Prettier
-- Git hooks：**lefthook**（`lefthook.yml`）
-- 发布：tag 触发 GitHub Actions；npm 发布由仓库变量 `NPM_OIDC_READY` 控制（OIDC + provenance）
+All project text is English: source comments, script output, CLI messages, Markdown documentation, CHANGELOG entries, and commit messages. Runtime data keeps its original language. The writing rules are in [docs/engineering/writing-style.md](./docs/engineering/writing-style.md).
 
-## 每次任务都必须成立
+## Tech stack
 
-1. 只使用具名导出，禁止 `export default`。
-2. 类型导入必须 `import type` / `export type`。
-3. 禁止 `any`；用 `unknown` + 类型守卫在边界收窄。
-4. 源码保持平台无关，不引入运行时 `node:*` 导入。
-5. 改 `package.json#exports` 必须同步 `tests/exports.test.ts`。
-6. 新增逻辑必须有测试；修 bug 必须先补复现用例。
-7. 改公开契约、构建/发布流程、事故修复时先写文档。
-8. `lint:check` 与 `typecheck` 必须通过，不提交 `--no-verify`。
-9. 不在 `tsdown.config.ts` 里开启 `exports: true`。
-10. 依赖版本改动后更新 `bun.lock`。
+- Package manager: **Bun** (lockfile `bun.lock`, CI uses `--frozen-lockfile`)
+- Build: **tsdown**, ESM + CJS dual format, `platform: 'neutral'`
+- Tests: **Vitest**, v8 coverage
+- Style: **@antfu/eslint-config** (with formatters), no Prettier
+- Git hooks: **lefthook** (`lefthook.yml`)
+- Release: a tag triggers GitHub Actions; npm publishing is gated by the repository variable `NPM_OIDC_READY` (OIDC + provenance)
 
-## 常用命令
+## Mandatory for every task
+
+1. Use named exports only; `export default` is forbidden.
+2. Type imports must use `import type` / `export type`.
+3. Avoid `any`; use `unknown` plus type guards, narrowed at boundaries.
+4. Keep the source platform-neutral; no runtime `node:*` imports.
+5. Changing `package.json#exports` must be mirrored in `tests/exports.test.ts`.
+6. New logic must have tests; fixing a bug starts with a reproduction case.
+7. Write documentation first when changing public contracts, the build/release process, or incident fixes.
+8. `lint:check` and `typecheck` must pass; never commit with `--no-verify`.
+9. Do not enable `exports: true` in `tsdown.config.ts`.
+10. Update `bun.lock` after any dependency version change.
+
+## Common commands
 
 ```bash
 bun install
@@ -32,18 +36,18 @@ bun run typecheck
 bun run lint:check
 bun run test
 bun run build
-bun run check        # 全量门禁
-bun run check:docs   # 文档链接与索引
+bun run check        # full gate
+bun run check:docs   # documentation links and index
 ```
 
-## 目录
+## Directories
 
-| 路径 | 职责 |
+| Path | Responsibility |
 |---|---|
-| `src/index.ts` | 唯一公开入口 |
-| `tests/` | 测试，镜像 `src/` |
-| `examples/` | 可运行示例 |
-| `scripts/` | 门禁与发布脚本 |
-| `docs/` | 内部文档，索引在 `docs/README.md` |
+| `src/index.ts` | the only public entry |
+| `tests/` | tests, mirroring `src/` |
+| `examples/` | runnable examples |
+| `scripts/` | gate and release scripts |
+| `docs/` | internal documentation, indexed in `docs/README.md` |
 | `.github/workflows/` | `ci.yml` / `publish.yml` |
-| `.github/ISSUE_TEMPLATE/` | Issue 模板 |
+| `.github/ISSUE_TEMPLATE/` | issue templates |

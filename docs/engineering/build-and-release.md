@@ -1,71 +1,71 @@
-# 构建与发布
+# Build and release
 
-## 构建
+## Build
 
-工具：**tsdown**（rolldown 内核），配置见 `tsdown.config.ts`。
+Tool: **tsdown** (rolldown core). Configuration lives in `tsdown.config.ts`.
 
-| 项 | 取值 | 理由 |
+| Item | Value | Rationale |
 |---|---|---|
-| `entry` | `src/index.ts` | 单入口，子路径入口需显式追加 |
-| `format` | `esm` + `cjs` | 同时兼容 `import` 与 `require` |
-| `dts` | `true` | 生成 `index.d.ts` / `index.d.cts` |
-| `platform` | `neutral` | 不绑定 Node，浏览器/Edge 可消费 |
-| `target` | `es2022` | 现代语法，避免过度降级 |
-| `neverBundle` | `/^node:/` | neutral 平台不解析 Node 内置模块 |
-| `exports` | `false` | `package.json#exports` 手工维护，构建不得改写 |
+| `entry` | `src/index.ts` | single entry; subpath entries are added explicitly |
+| `format` | `esm` + `cjs` | supports both `import` and `require` |
+| `dts` | `true` | generates `index.d.ts` / `index.d.cts` |
+| `platform` | `neutral` | not bound to Node; browsers and Edge can consume it |
+| `target` | `es2022` | modern syntax, avoids excessive downleveling |
+| `neverBundle` | `/^node:/` | the neutral platform does not resolve Node built-ins |
+| `exports` | `false` | `package.json#exports` is maintained by hand; the build must not rewrite it |
 
-产物契约：
+Artifact contract:
 
 ```
 dist/index.js      ESM
 dist/index.cjs     CJS
-dist/index.d.ts    ESM 类型
-dist/index.d.cts   CJS 类型
+dist/index.d.ts    ESM types
+dist/index.d.cts   CJS types
 ```
 
-CI 会在 build 后校验这四个文件存在，并分别在 Node 20/22/24 下导入验证；`bun run verify:package` 还会检查 tarball 文件清单，确保源码、测试、脚本不会被打进发布包。
+CI verifies these four files exist after the build and imports each under Node 20/22/24; `bun run verify:package` also checks the tarball file list to keep source, tests, and scripts out of the published package.
 
-## package.json 契约
+## package.json contract
 
-- `exports["."]` 必须是 `import` / `require` 各自带 `types` 的条件对象。
-- `files` 只包含 `dist`、`LICENSE.md`、`README.md`。
-- `sideEffects: false`，保证 tree-shaking。
-- `engines.node` 与 CI 矩阵下限保持一致。
-- `publishConfig` 只声明 `access: public`：本地手动 `npm publish` 时 npm 无法生成 provenance，会直接 `EUSAGE` 失败；provenance 由发布 workflow 用 `npm publish --provenance` 显式开启。
+- `exports["."]` must be a conditional object with `types` under each of `import` / `require`.
+- `files` contains only `dist`, `LICENSE.md`, and `README.md`.
+- `sideEffects: false` guarantees tree-shaking.
+- `engines.node` matches the lower bound of the CI matrix.
+- `publishConfig` declares only `access: public`: npm cannot generate provenance for a local manual `npm publish` and fails with `EUSAGE`; the publish workflow turns provenance on explicitly with `npm publish --provenance`.
 
-`tests/exports.test.ts` 锁定上述形状，改动导出面必须先改测试。
+`tests/exports.test.ts` locks the shape above; changing the export surface requires changing the test first.
 
-## 发布链路
+## Release chain
 
-1. 更新 `CHANGELOG.md` 的 `## Unreleased`，写清本版变化。
-2. `bun run release` → `bumpp` 升级版本、提交、打 tag、推送。
-3. tag 推送触发 `.github/workflows/publish.yml`：
-   - 校验 tag 与 `package.json#version` 一致
-   - 校验 `CHANGELOG.md` 存在 `## <version>` 节
+1. Update `## Unreleased` in `CHANGELOG.md` and describe this version's changes.
+2. `bun run release` -> `bumpp` bumps the version, commits, tags, and pushes.
+3. The tag push triggers `.github/workflows/publish.yml`:
+   - verify the tag matches `package.json#version`
+   - verify `CHANGELOG.md` contains a `## <version>` section
    - typecheck / lint:check / test / build
    - `npm publish --provenance --access public`
-4. 发布后再创建 GitHub Release（可复用 CHANGELOG 该节作为 notes）。
+4. After publishing, create the GitHub Release (the same CHANGELOG section can serve as the notes).
 
-### 首次发布（引导）
+### First release (bootstrap)
 
-Trusted Publisher 只有在 npm 包存在后才能配置，所以首次发布必须手动：
+A Trusted Publisher can only be configured after the npm package exists, so the first release is manual:
 
-1. 推送 tag；`publish.yml` 会跑，但 `publish` job 因仓库变量 `NPM_OIDC_READY` 未设置而 **跳过**。
-2. 在干净的 tag 检出上执行 `npm publish --access public`。本地不要加 `--provenance`，它只在受支持的 CI 环境可用。
-3. 在 npm 包设置中把本仓库与 `publish.yml` 绑定为 Trusted Publisher。
-4. 设置仓库变量 `NPM_OIDC_READY=true`（Settings → Secrets and variables → Actions → Variables）。之后推送 tag 即由 OIDC 自动发布。
+1. Push the tag; `publish.yml` runs, but its `publish` job is **skipped** because the repository variable `NPM_OIDC_READY` is unset.
+2. From a clean checkout of the tag, run `npm publish --access public`. Do not pass `--provenance` locally; it is only available from a supported CI environment.
+3. In the npm package settings, bind this repository and `publish.yml` as the Trusted Publisher.
+4. Set the repository variable `NPM_OIDC_READY=true` (Settings -> Secrets and variables -> Actions -> Variables). From then on a tag push publishes through OIDC automatically.
 
-## 认证
+## Authentication
 
-使用 **npm Trusted Publisher（OIDC）**，不配置 `NPM_TOKEN`：
+Use **npm Trusted Publisher (OIDC)** and do not configure an `NPM_TOKEN`:
 
-- workflow 需要 `permissions.id-token: write`。
-- `setup-node` 刻意**不设置** `registry-url`，避免写入占位 token 的 `.npmrc`。
-- 首次发布前在 npm 包设置中绑定本仓库与本 workflow。
-- `publish` job 由 `if: vars.NPM_OIDC_READY == 'true'` 兜底：引导完成前保持变量未设置，避免误发。
+- The workflow needs `permissions.id-token: write`.
+- `setup-node` deliberately **does not** set `registry-url`, to avoid writing an `.npmrc` with a placeholder token.
+- Bind this repository and this workflow in the npm package settings before the first release.
+- The `publish` job is gated by `if: vars.NPM_OIDC_READY == 'true'`: keep the variable unset until bootstrap is done so nothing publishes by accident.
 
-## 禁止
+## Forbidden
 
-- 本地直接 `npm publish`（绕过门禁）。首次引导发布是唯一例外，见上文「首次发布（引导）」。
-- 在 `tsdown.config.ts` 中开启 `exports: true`（会改写手工维护的 exports）。
-- 发布前不更新 CHANGELOG（CI 会直接失败）。
+- Running `npm publish` directly locally (it bypasses the gates). The first bootstrap release is the only exception; see "First release (bootstrap)" above.
+- Enabling `exports: true` in `tsdown.config.ts` (it rewrites the hand-maintained exports).
+- Publishing without updating the CHANGELOG (CI fails immediately).

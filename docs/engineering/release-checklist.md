@@ -1,15 +1,15 @@
-# 发版检查表
+# Release checklist
 
-按顺序逐项确认，任何一项失败都停下修复，不要跳步。
+Confirm each item in order. If any item fails, stop and fix it instead of skipping ahead.
 
-## 发版前
+## Before the release
 
-- [ ] `main` 上工作区干净，与 `origin/main` 一致
-- [ ] `CHANGELOG.md` 的 `## Unreleased` 已写全本版变化
-- [ ] 破坏性变更已在 CHANGELOG 与文档中标注
-- [ ] 公开导出面变化已更新 `tests/exports.test.ts`
+- [ ] The working tree on `main` is clean and matches `origin/main`
+- [ ] `## Unreleased` in `CHANGELOG.md` fully describes this version's changes
+- [ ] Breaking changes are flagged in the CHANGELOG and the docs
+- [ ] Public export surface changes have updated `tests/exports.test.ts`
 
-## 本地门禁
+## Local gates
 
 ```bash
 bun install --frozen-lockfile
@@ -17,30 +17,30 @@ bun run check
 bun run check:docs
 ```
 
-- [ ] 全部通过
-- [ ] `dist/` 下存在 `index.js` / `index.cjs` / `index.d.ts` / `index.d.cts`
-- [ ] `bun run verify:package` 通过
-- [ ] 本地 `node -e "require('./dist/index.cjs')"` 与 ESM 导入均成功
+- [ ] Everything passes
+- [ ] `dist/` contains `index.js` / `index.cjs` / `index.d.ts` / `index.d.cts`
+- [ ] `bun run verify:package` passes
+- [ ] Both `node -e "require('./dist/index.cjs')"` and an ESM import succeed locally
 
-## 发版
+## Release
 
 ```bash
 bun run release
 ```
 
-- [ ] `bumpp` 完成版本升级、提交与 tag
-- [ ] tag 已推送（`git push --follow-tags`）
-- [ ] GitHub Actions `Publish` 通过（或在 `NPM_OIDC_READY` 未设置时跳过）
-- [ ] npm 上可以 `npm view <pkg>@<version>` 查到
-- [ ] 创建 GitHub Release，notes 取自 CHANGELOG 对应版本节
+- [ ] `bumpp` completes the version bump, commit, and tag
+- [ ] The tag is pushed (`git push --follow-tags`)
+- [ ] GitHub Actions `Publish` passes (or is skipped while `NPM_OIDC_READY` is unset)
+- [ ] `npm view <pkg>@<version>` resolves on npm
+- [ ] The GitHub Release is created with notes from the matching CHANGELOG section
 
-### 仅首次发布
+### First release only
 
-- [ ] 从 tag 手动发布（`npm publish --access public`）；在 `NPM_OIDC_READY` 变量存在前，workflow 的 `publish` job 会被跳过
-- [ ] 为「本仓库 + `publish.yml`」配置 npm Trusted Publisher
-- [ ] 创建仓库变量 `NPM_OIDC_READY=true`
+- [ ] Publish manually from the tag (`npm publish --access public`); the workflow's `publish` job is skipped until the `NPM_OIDC_READY` variable exists
+- [ ] Configure the npm Trusted Publisher for this repository and `publish.yml`
+- [ ] Create the repository variable `NPM_OIDC_READY=true`
 
-## 回滚
+## Rollback
 
-- 已发布版本不可撤下时，发布新的 patch 版本修复，不覆盖已有版本。
-- 需要废弃版本时使用 `npm deprecate`，并说明替代版本。
+- When a released version cannot be unpublished, ship a new patch version with the fix instead of overwriting it.
+- To retire a version, use `npm deprecate` and name the replacement version.

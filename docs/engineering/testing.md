@@ -1,36 +1,36 @@
-# 测试
+# Testing
 
-## 分层
+## Layers
 
-| 层 | 位置 | 依赖 | 内容 |
+| Layer | Location | Dependencies | Content |
 |---|---|---|---|
-| 单元 | `tests/unit/` | 无 IO | 纯函数、解析、边界条件 |
-| 组件 | `tests/component/` | 注入的 fake | 模块间协作，替换外部依赖 |
-| 契约 | `tests/exports.test.ts` | 文件系统 | `package.json` 导出面、files、engines |
+| Unit | `tests/unit/` | no IO | pure functions, parsing, edge cases |
+| Component | `tests/component/` | injected fakes | module collaboration with external dependencies replaced |
+| Contract | `tests/exports.test.ts` | filesystem | `package.json` export surface, files, engines |
 
-目录镜像 `src/` 结构：`tests/unit/utils/id-codec.test.ts` 对应 `src/utils/id-codec.ts`。
+The directory mirrors `src/`: `tests/unit/utils/id-codec.test.ts` corresponds to `src/utils/id-codec.ts`.
 
-## 命名
+## Naming
 
-- 文件 `*.test.ts`，集成测试可用 `*.e2e.test.ts`。
-- 用例名描述行为与结果：`returns null for empty input`、`throws when status is not ok`。
-- 一个文件内按主题分 `describe`。
+- Files are `*.test.ts`; integration tests may use `*.e2e.test.ts`.
+- Case names describe the behavior and result: `returns null for empty input`, `throws when status is not ok`.
+- Group related cases with `describe` inside a file.
 
-## 工具
+## Tools
 
-- Vitest，`globals: true`，显式 import 也合法，但同仓保持一致。
-- 共享替身放在 `tests/testkit/`，各文件内的更强 fake 就地定义。
-- 用工厂函数构造被测对象，避免 `beforeEach` 共享可变状态。
+- Vitest with `globals: true`; explicit imports are also valid, but stay consistent within the repo.
+- Shared doubles live in `tests/testkit/`; stronger fakes specific to a file are defined locally.
+- Build the subject through a factory function instead of sharing mutable state in `beforeEach`.
 
-## 覆盖率
+## Coverage
 
-`bun run test:coverage` 使用 v8，报告 `text-summary` / `json-summary` / `lcov`，输出到 `coverage/`。
+`bun run test:coverage` uses v8 and reports `text-summary`, `json-summary`, and `lcov` into `coverage/`.
 
-- 覆盖率阈值是棘轮：只允许上调，不允许为了过 CI 下调。
-- 新增逻辑必须带测试；修 bug 必须先补能复现的用例。
+- The coverage threshold is a ratchet: it may only go up, never down to pass CI.
+- New logic needs tests; a bug fix starts with a failing reproduction case.
 
-## 禁止
+## Forbidden
 
-- 测试之间共享可变状态。
-- 依赖真实网络或真实时间的单元测试。
-- `expect(true).toBe(true)` 之类的空断言。
+- Shared mutable state between tests.
+- Unit tests that depend on the real network or the real clock.
+- Empty assertions such as `expect(true).toBe(true)`.

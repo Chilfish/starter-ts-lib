@@ -1,50 +1,50 @@
-# 事故复盘
+# Postmortems
 
-每次线上/发布事故后写一篇复盘，编号递增：`NNN-short-slug.md`。
+Write one postmortem after every production or release incident, numbered in increasing order: `NNN-short-slug.md`.
 
-## 索引
+## Index
 
-| 编号 | 主题 | 根因归类 | 一句话教训 |
+| Number | Topic | Root cause category | One-line lesson |
 |---|---|---|---|
-| — | 暂无 | — | — |
+| — | None yet | — | — |
 
-## 高频雷区自查清单
+## Recurring pitfall checklist
 
-写代码或改配置前先过一遍：
+Run through this before writing code or changing configuration:
 
-### 构建与产物
+### Build and artifacts
 
-- `tsdown.config.ts` 是否误开 `exports: true`，覆盖了手工维护的 `exports`？
-- 新增子路径入口时，`entry` 与 `package.json#exports` 是否同步？
-- `platform: 'neutral'` 下是否引入了运行时 `node:*` 导入？
+- Does `tsdown.config.ts` accidentally enable `exports: true` and overwrite the hand-maintained `exports`?
+- When adding a subpath entry, are `entry` and `package.json#exports` in sync?
+- Did anything under `platform: 'neutral'` introduce a runtime `node:*` import?
 
-### 依赖与锁文件
+### Dependencies and lockfile
 
-- 是否只改了 `package.json` 而忘记更新 `bun.lock`？
-- CI 使用 `--frozen-lockfile`，锁文件与 manifest 不一致会直接失败。
+- Did you change only `package.json` and forget `bun.lock`?
+- CI uses `--frozen-lockfile`; a lockfile that disagrees with the manifest fails immediately.
 
-### CI / 发布
+### CI and release
 
-- action 版本是否真实存在？（`checkout@v4`、`setup-bun@v2`、`setup-node@v4`）
-- 发布是否走 OIDC，是否误加了 `NPM_TOKEN` 或 `registry-url`？
-- `publishConfig` 是否误写了 `provenance: true`？本地手动 `npm publish` 会因此报 `EUSAGE`；provenance 只由 workflow 的 `--provenance` 开启。
-- 首次发布是否走完引导流程（手动发布 → 绑定 Trusted Publisher → 设置 `NPM_OIDC_READY=true`）？未设置变量时 `publish` job 会被跳过。
-- CI 里执行 `bun install --production` 时，`prepare`（`lefthook install`）会因 devDependency 缺失而 127；这类 job 要加 `--ignore-scripts`。
-- `CHANGELOG.md` 是否有对应版本节？`package.json#version` 与 tag 是否一致？
+- Does the action version really exist? (`checkout@v4`, `setup-bun@v2`, `setup-node@v4`)
+- Does publishing go through OIDC, and did you accidentally add `NPM_TOKEN` or `registry-url`?
+- Did `publishConfig` accidentally set `provenance: true`? A local manual `npm publish` then fails with `EUSAGE`; provenance is only enabled by the workflow's `--provenance`.
+- Did the first release complete the bootstrap flow (manual publish -> bind Trusted Publisher -> set `NPM_OIDC_READY=true`)? The `publish` job is skipped while the variable is unset.
+- Does `bun install --production` in CI run `prepare` (`lefthook install`), which fails with 127 because devDependencies are missing? Such a job needs `--ignore-scripts`.
+- Does `CHANGELOG.md` have a matching version section? Do `package.json#version` and the tag agree?
 
-### 测试
+### Tests
 
-- 新增逻辑是否带测试？
-- 是否出现依赖真实网络或真实时间的测试？
+- Does new logic have tests?
+- Is any test depending on the real network or the real clock?
 
-### 文档
+### Documentation
 
-- 公开契约、构建流程、事故修复是否同步了文档？
-- 文档中的命令、路径、字段是否仍与代码一致？
+- Are public contracts, the build process, and incident fixes reflected in the docs?
+- Do the commands, paths, and fields in the docs still match the code?
 
-## 写作要求
+## Writing requirements
 
-- 事实优先：时间线、证据、影响范围。
-- 根因写到可执行的层面，不写「粗心」。
-- 每条教训必须能落到「雷区清单」或 `AGENTS.md` 中。
-- 使用 [TEMPLATE.md](./TEMPLATE.md)。
+- Facts first: timeline, evidence, impact.
+- Take the root cause down to an actionable level; do not write "carelessness".
+- Every lesson must land in the pitfall checklist or in `AGENTS.md`.
+- Use [TEMPLATE.md](./TEMPLATE.md).

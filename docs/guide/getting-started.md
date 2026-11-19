@@ -1,16 +1,16 @@
-# 快速开始
+# Getting started
 
-## 环境要求
+## Requirements
 
-| 工具 | 版本 | 用途 |
+| Tool | Version | Purpose |
 |---|---|---|
-| Bun | 1.4.4+ | 安装依赖、运行脚本、本地开发 |
-| Node.js | 20+ | 运行时（`engines.node`） |
+| Bun | 1.4.4+ | Install dependencies, run scripts, local development |
+| Node.js | 20+ | Runtime (`engines.node`) |
 | Git | 2.4+ | lefthook hooks |
 
-Bun 版本锁定在 `package.json#packageManager`，CI 使用同版本。
+The Bun version is pinned in `package.json#packageManager`; CI uses the same version.
 
-## 初始化
+## Initialize
 
 ```bash
 git clone git@github.com:Chilfish/starter-ts-lib.git my-lib
@@ -18,27 +18,27 @@ cd my-lib
 bun install
 ```
 
-`bun install` 会自动执行 `prepare: lefthook install`，安装 Git hooks。
+`bun install` runs `prepare: lefthook install` and sets up the Git hooks.
 
-## 改成你的项目
+## Make it your project
 
-1. 修改 `package.json`：`name`、`description`、`repository`、`homepage`、`bugs`、`keywords`。
-2. 修改 `README.md` 标题与安装命令。
-3. 替换 `src/index.ts` 的占位导出，并同步 `tests/index.test.ts`。
-4. 更新 `LICENSE.md` 的版权信息。
-5. 更新 `CHANGELOG.md`，清空模板内容。
-6. npm 上创建包并配置 Trusted Publisher（见 [build-and-release](../engineering/build-and-release.md)）。
+1. Update `package.json`: `name`, `description`, `repository`, `homepage`, `bugs`, `keywords`.
+2. Update the `README.md` title and install command.
+3. Replace the placeholder exports in `src/index.ts` and mirror them in `tests/index.test.ts`.
+4. Update the copyright in `LICENSE.md`.
+5. Update `CHANGELOG.md` and clear the template content.
+6. Create the package on npm and configure the Trusted Publisher (see [build-and-release](../engineering/build-and-release.md)).
 
-## 第一条命令
+## First command
 
 ```bash
 bun run check
 ```
 
-它依次执行 typecheck、lint、测试覆盖率、构建、产物校验。全绿即表示脚手架可用。
+It runs typecheck, lint, test coverage, build, and artifact verification in order. A green run means the scaffold works.
 
-## 下一步
+## Next steps
 
-- 日常命令与发布流程：[usage.md](./usage.md)
-- 架构与目录约定：[architecture.md](../engineering/architecture.md)
-- 代码风格：[code-style.md](../engineering/code-style.md)
+- Daily commands and releasing: [usage.md](./usage.md)
+- Architecture and directory conventions: [architecture.md](../engineering/architecture.md)
+- Code style: [code-style.md](../engineering/code-style.md)
