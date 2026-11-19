@@ -27,6 +27,9 @@
 
 - action 版本是否真实存在？（`checkout@v4`、`setup-bun@v2`、`setup-node@v4`）
 - 发布是否走 OIDC，是否误加了 `NPM_TOKEN` 或 `registry-url`？
+- `publishConfig` 是否误写了 `provenance: true`？本地手动 `npm publish` 会因此报 `EUSAGE`；provenance 只由 workflow 的 `--provenance` 开启。
+- 首次发布是否走完引导流程（手动发布 → 绑定 Trusted Publisher → 设置 `NPM_OIDC_READY=true`）？未设置变量时 `publish` job 会被跳过。
+- CI 里执行 `bun install --production` 时，`prepare`（`lefthook install`）会因 devDependency 缺失而 127；这类 job 要加 `--ignore-scripts`。
 - `CHANGELOG.md` 是否有对应版本节？`package.json#version` 与 tag 是否一致？
 
 ### 测试

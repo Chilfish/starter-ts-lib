@@ -12,7 +12,7 @@
 | `sideEffects` | `false` | 保证 tree-shaking |
 | `files` | `dist` / `LICENSE.md` / `README.md` | 只发布产物与文档 |
 | `engines.node` | `>=20` | 与 CI 运行时矩阵下限一致 |
-| `publishConfig` | `access: public`、`provenance: true` | 通过 OIDC 发布并附带来源证明 |
+| `publishConfig` | `access: public` | provenance 由 workflow 的 `npm publish --provenance` 显式开启，不写进 `publishConfig`（否则本地手动发布会报 EUSAGE） |
 
 ## exports
 
@@ -58,5 +58,6 @@
 |---|---|
 | `build` | 只调用 `tsdown`，不做额外拷贝 |
 | `check` | 汇总全量门禁，CI 与本地共用 |
+| `check:docs` / `verify:package` / `verify:tag` | 门禁脚本用 TypeScript 编写，由 `bun` 直接执行（无需构建） |
 | `prepublishOnly` | 只构建，防误发 |
 | `release` | 只做版本升级与 tag，不在本地 publish |

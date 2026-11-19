@@ -9,7 +9,7 @@
 - 测试：**Vitest**，v8 coverage
 - 风格：**@antfu/eslint-config**（含 formatters），不使用 Prettier
 - Git hooks：**lefthook**（`lefthook.yml`）
-- 发布：tag 触发 GitHub Actions，npm OIDC + provenance
+- 发布：tag 触发 GitHub Actions；npm 发布由仓库变量 `NPM_OIDC_READY` 控制（OIDC + provenance）
 
 ## 每次任务都必须成立
 

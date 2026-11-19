@@ -31,7 +31,7 @@ CI 会在 build 后校验这四个文件存在，并分别在 Node 20/22/24 下�
 - `files` 只包含 `dist`、`LICENSE.md`、`README.md`。
 - `sideEffects: false`，保证 tree-shaking。
 - `engines.node` 与 CI 矩阵下限保持一致。
-- `publishConfig.provenance: true`，发布时附带来源证明。
+- `publishConfig` 只声明 `access: public`：本地手动 `npm publish` 时 npm 无法生成 provenance，会直接 `EUSAGE` 失败；provenance 由发布 workflow 用 `npm publish --provenance` 显式开启。
 
 `tests/exports.test.ts` 锁定上述形状，改动导出面必须先改测试。
 
@@ -46,6 +46,15 @@ CI 会在 build 后校验这四个文件存在，并分别在 Node 20/22/24 下�
    - `npm publish --provenance --access public`
 4. 发布后再创建 GitHub Release（可复用 CHANGELOG 该节作为 notes）。
 
+### 首次发布（引导）
+
+Trusted Publisher 只有在 npm 包存在后才能配置，所以首次发布必须手动：
+
+1. 推送 tag；`publish.yml` 会跑，但 `publish` job 因仓库变量 `NPM_OIDC_READY` 未设置而 **跳过**。
+2. 在干净的 tag 检出上执行 `npm publish --access public`。本地不要加 `--provenance`，它只在受支持的 CI 环境可用。
+3. 在 npm 包设置中把本仓库与 `publish.yml` 绑定为 Trusted Publisher。
+4. 设置仓库变量 `NPM_OIDC_READY=true`（Settings → Secrets and variables → Actions → Variables）。之后推送 tag 即由 OIDC 自动发布。
+
 ## 认证
 
 使用 **npm Trusted Publisher（OIDC）**，不配置 `NPM_TOKEN`：
@@ -53,9 +62,10 @@ CI 会在 build 后校验这四个文件存在，并分别在 Node 20/22/24 下�
 - workflow 需要 `permissions.id-token: write`。
 - `setup-node` 刻意**不设置** `registry-url`，避免写入占位 token 的 `.npmrc`。
 - 首次发布前在 npm 包设置中绑定本仓库与本 workflow。
+- `publish` job 由 `if: vars.NPM_OIDC_READY == 'true'` 兜底：引导完成前保持变量未设置，避免误发。
 
 ## 禁止
 
-- 本地直接 `npm publish`（绕过门禁）。
+- 本地直接 `npm publish`（绕过门禁）。首次引导发布是唯一例外，见上文「首次发布（引导）」。
 - 在 `tsdown.config.ts` 中开启 `exports: true`（会改写手工维护的 exports）。
 - 发布前不更新 CHANGELOG（CI 会直接失败）。

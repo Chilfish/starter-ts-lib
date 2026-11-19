@@ -6,6 +6,7 @@
 
 ### 变更
 
+- 门禁脚本从 `.mjs` 迁移到 TypeScript（`scripts/*.ts`），由 `bun` 直接执行，并纳入 `tsc --noEmit` 检查。
 - 构建工具从 unbuild 迁移到 tsdown，产出 ESM + CJS 双格式与独立类型声明。
 - 包管理器从 pnpm 切换到 Bun，锁文件为 `bun.lock`。
 - CI/发布流水线改用真实存在的 action 版本，发布走 OIDC + provenance。
@@ -13,7 +14,7 @@
 - 修复 `exports` 条件类型、`engines`、`publishConfig` 等元数据。
 - 测试迁移到 `tests/`，增加导出面契约测试与覆盖率配置。
 - 新增 `docs/` 文档体系、`AGENTS.md`、`CHANGELOG.md`。
-- 新增开箱即用基建：`examples/`、`scripts/verify-package.mjs`、`scripts/verify-release-tag.mjs`、`scripts/check-docs.mjs`。
+- 新增开箱即用基建：`examples/`、`scripts/verify-package.ts`、`scripts/verify-release-tag.ts`、`scripts/check-docs.ts`。
 - 新增社区文件：`CONTRIBUTING.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md`、Issue/PR 模板、`.editorconfig`、`.nvmrc`、Dependabot。
 - CI 增加产物校验、文档校验、示例运行与覆盖率上传；发布增加 registry 轮询。
 

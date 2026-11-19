@@ -75,7 +75,7 @@ lefthook.yml         # Git hooks
 1. 在 `CHANGELOG.md` 的 `## Unreleased` 写清本次变化。
 2. 运行 `bun run release`，`bumpp` 会升级版本、提交、打 tag 并推送。
 3. 推送的 `v*` tag 触发 `publish.yml`：校验 tag 与 `package.json`、CHANGELOG 版本节、全量门禁，然后 `npm publish --provenance`。
-4. 发布后在 npm 包设置里配置 Trusted Publisher（GitHub Actions）。
+4. 首次发布走引导流程：`publish` job 在仓库变量 `NPM_OIDC_READY` 未设置时跳过，需先在 tag 上手动 `npm publish --access public`，再在 npm 包设置里配置 Trusted Publisher，最后把 `NPM_OIDC_READY` 设为 `true`。
 
 详见 [docs/engineering/build-and-release.md](./docs/engineering/build-and-release.md) 与 [发版检查表](./docs/engineering/release-checklist.md)。
 

@@ -30,9 +30,15 @@ bun run release
 
 - [ ] `bumpp` 完成版本升级、提交与 tag
 - [ ] tag 已推送（`git push --follow-tags`）
-- [ ] GitHub Actions `Publish` 通过
+- [ ] GitHub Actions `Publish` 通过（或在 `NPM_OIDC_READY` 未设置时跳过）
 - [ ] npm 上可以 `npm view <pkg>@<version>` 查到
 - [ ] 创建 GitHub Release，notes 取自 CHANGELOG 对应版本节
+
+### 仅首次发布
+
+- [ ] 从 tag 手动发布（`npm publish --access public`）；在 `NPM_OIDC_READY` 变量存在前，workflow 的 `publish` job 会被跳过
+- [ ] 为「本仓库 + `publish.yml`」配置 npm Trusted Publisher
+- [ ] 创建仓库变量 `NPM_OIDC_READY=true`
 
 ## 回滚
 
