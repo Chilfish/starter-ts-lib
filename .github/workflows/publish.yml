@@ -15,6 +15,9 @@ concurrency:
 
 jobs:
   publish:
+    # OIDC 发布默认关闭：npm 包尚不存在时无法绑定 Trusted Publisher，首次发布必须在
+    # 本地手动完成。完成绑定后设置仓库变量 NPM_OIDC_READY=true 即可由 tag 自动发布。
+    if: vars.NPM_OIDC_READY == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
